@@ -1,0 +1,39 @@
+{
+  "name": "fetch-logistics",
+  "version": "0.0.1",
+  "description": "> TODO: description",
+  "author": "jx <841207@gmail.com>",
+  "homepage": "",
+  "private": false,
+  "license": "ISC",
+  "main": "dist/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@code.aliyun.com:java-micro-service/db-event.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1",
+    "build": "rimraf dist&&tsc"
+  },
+  "gitHead": "52725f03d09565f9002819a78c6110b5724682a0",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "damerau-levenshtein": "^1.0.6",
+    "redis": "^3.0.2",
+    "redis-observable": "^0.2.5",
+    "rxjs": "^6.5.5",
+    "trackingmore": "^1.1.21"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.4",
+    "@types/redis": "^2.8.22",
+    "eslint": "^6.8.0",
+    "prettier": "^1.18.2",
+    "rimraf": "^3.0.2",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.8.3"
+  }
+}
