@@ -23,7 +23,7 @@ export class Dispatcher {
   private constructor() {}
   private static redis: RxRedis;
   private static instance: Dispatcher;
-  static register = <P extends ExpressCreator>(
+  static register = async <P extends ExpressCreator>(
     creator: P,
     config: ExpressOption<P>,
   ) => {
@@ -36,9 +36,9 @@ export class Dispatcher {
         return;
       }
     }
-    Dispatcher.instance.handlers.push(
-      new creator({ redis: Dispatcher.redis, config }),
-    );
+    const handler = new creator({ redis: Dispatcher.redis, config });
+    await handler.init().toPromise();
+    Dispatcher.instance.handlers.push(handler);
     Dispatcher.instance.handlers = Dispatcher.instance.handlers.sort(
       (a, b) => a.weight - b.weight,
     );
