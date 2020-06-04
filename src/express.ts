@@ -240,7 +240,7 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     const data = this.getProcess(source);
     const md5 = this.getMd5(data);
     const guess = this.guess_sign(data);
-    const request_count = container.request_count + 1;
+    const request_count = container.request_count;
     const now = new Date();
     const state =
       _state !== ExpressState.DELIVERED && guess
