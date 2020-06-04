@@ -1,6 +1,6 @@
 {
   "name": "fetch-logistics",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "> TODO: description",
   "author": "jx <841207@gmail.com>",
   "homepage": "",
@@ -25,7 +25,7 @@
     "redis": "^3.0.2",
     "redis-observable": "^0.2.5",
     "rxjs": "^6.5.5",
-    "trackingmore": "^1.1.21"
+    "trackingmore": "^1.1.22"
   },
   "devDependencies": {
     "@types/node": "^14.0.4",

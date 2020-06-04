@@ -40,7 +40,7 @@ export class Dispatcher {
     await handler.init().toPromise();
     Dispatcher.instance.handlers.push(handler);
     Dispatcher.instance.handlers = Dispatcher.instance.handlers.sort(
-      (a, b) => a.weight - b.weight,
+      (a, b) => b.weight - a.weight,
     );
     return;
   };
