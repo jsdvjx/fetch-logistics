@@ -78,7 +78,7 @@ export class TmHandler<
     return info
       ? ({
           ...info,
-          customer_email: info.customer_email[0],
+          customer_email: (info.customer_email || [null])[0],
         } as WebhookBody)
       : null;
   };
