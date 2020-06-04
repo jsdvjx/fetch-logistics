@@ -1,6 +1,6 @@
-import { Observable, of, zip, merge } from 'rxjs';
+import { Observable, of, zip, merge, concat } from 'rxjs';
 import { RxRedis } from 'redis-observable';
-import { map, mergeMap, tap } from 'rxjs/operators';
+import { map, mergeMap, tap, concatMap } from 'rxjs/operators';
 import * as crypto from 'crypto';
 import * as levenshtien from 'damerau-levenshtein';
 import { TmHandler } from './handler/tm.handler';
@@ -287,14 +287,13 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
   protected codes: Set<string>;
   protected abstract _init?: () => Observable<any>;
   init = () => {
-    return this.initCode().pipe(
+    return (this._init || (() => of(null)))().pipe(
+      mergeMap(this.initCode),
       tap(codeMap => {
         this.codeMap = codeMap;
         this.codes = new Set(this.codeMap.map(i => i.code));
       }),
-      mergeMap(() =>
-        (this._init ? this._init() : of(null)).pipe(map(i => this)),
-      ),
+      map(() => this),
     );
   };
   protected fixCode = (param: QueryParam) => {

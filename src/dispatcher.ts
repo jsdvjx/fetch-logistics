@@ -19,7 +19,7 @@ export type ExpressOption<O> = O extends {
   ? X
   : any;
 export class Dispatcher {
-  private handlers: IExpress[];
+  private handlers: IExpress[]=[];
   private constructor() {}
   private static redis: RxRedis;
   private static instance: Dispatcher;
@@ -30,7 +30,6 @@ export class Dispatcher {
     if (!Dispatcher.instance) {
       throw new Error('Must create a Dispatcher instance');
     }
-    Dispatcher.instance.handlers = Dispatcher.instance.handlers || [];
     for (const handler of Dispatcher.instance.handlers) {
       if (handler.name === config.name) {
         handler.setConfig(config);
@@ -68,8 +67,8 @@ export class Dispatcher {
   };
   query = (
     param: QueryParam,
-    handler_name: string = null,
     force: boolean = true,
+    handler_name: string = null,
   ) => {
     const handler = this.chose(param, handler_name);
     return (handler
