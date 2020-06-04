@@ -14,7 +14,9 @@ import {
 } from 'trackingmore';
 import { Observable, of } from 'rxjs';
 import { pluck, map } from 'rxjs/operators';
-export class TmHandler extends IExpress<WebhookBody, { apiKey: string }> {
+export class TmHandler<
+  O extends { apiKey: string } = { apiKey: string }
+> extends IExpress<WebhookBody, O> {
   protected expire: number = 3600 * 24 * 10;
   protected checkList: { type: 'white' | 'black' | 'none'; codes: string[] } = {
     type: 'black',

@@ -3,6 +3,7 @@ import { RxRedis } from 'redis-observable';
 import { map, mergeMap, tap } from 'rxjs/operators';
 import * as crypto from 'crypto';
 import * as levenshtien from 'damerau-levenshtein';
+import { TmHandler } from './handler/tm.handler';
 export enum ExpressState {
   /**
    * 无效状态
@@ -81,7 +82,9 @@ export interface ExpressPolicy {
   type: 'white' | 'black' | 'none';
   codes: string[];
 }
+
 export interface ExpressHandlerOption<T extends Record<string, any>> {
+  name: string;
   webhook?: boolean;
   weight?: number;
   rate?: number;

@@ -1,6 +1,6 @@
 {
   "name": "fetch-logistics",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "> TODO: description",
   "author": "jx <841207@gmail.com>",
   "homepage": "",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@code.aliyun.com:java-micro-service/db-event.git"
+    "url": "git@github.com:jsdvjx/fetch-logistics.git"
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
