@@ -30,6 +30,7 @@ export class Dispatcher {
     if (!Dispatcher.instance) {
       throw new Error('Must create a Dispatcher instance');
     }
+    Dispatcher.instance.handlers = Dispatcher.instance.handlers || [];
     for (const handler of Dispatcher.instance.handlers) {
       if (handler.name === config.name) {
         handler.setConfig(config);
