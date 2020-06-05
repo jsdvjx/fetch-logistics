@@ -19,7 +19,7 @@ export type ExpressOption<O> = O extends {
   ? X
   : any;
 export class Dispatcher {
-  private handlers: IExpress[]=[];
+  private handlers: IExpress[] = [];
   private constructor() {}
   private static redis: RxRedis;
   private static instance: Dispatcher;
@@ -44,12 +44,13 @@ export class Dispatcher {
     );
     return;
   };
-  static create = (redisOpt: redis.ClientOpts) => {
+  static create = (redisOpt: redis.ClientOpts | RxRedis) => {
     if (Dispatcher.instance) {
       return Dispatcher.instance;
     }
     if (!Dispatcher.redis) {
-      Dispatcher.redis = new RxRedis(redisOpt);
+      Dispatcher.redis =
+        redisOpt instanceof RxRedis ? redisOpt : new RxRedis(redisOpt);
     }
     Dispatcher.instance = new Dispatcher();
     return Dispatcher.instance;
