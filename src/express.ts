@@ -176,6 +176,9 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
         if (info.request_count >= this.max_count && !force) {
           return of(info);
         }
+        if (this.rate > (Date.now() / 1000 - info.last_request)) {
+          return of(info);
+        }
         return this.fetch(info).pipe(
           mergeMap(source => this.push(source, param)),
         );

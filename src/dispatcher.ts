@@ -80,7 +80,9 @@ export class Dispatcher {
   ) => {
     const handler = this.chose(param, handler_name);
     if (handler.webhook) {
-      return of(null) as Observable<ExpressInfo<any>>;
+      return force
+        ? handler.getCacheOrInit(param)
+        : (of(null) as Observable<ExpressInfo<any>>);
     }
     return (handler
       ? (force ? handler.query : handler.getCacheOrInit)(param, force)
