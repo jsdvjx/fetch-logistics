@@ -164,6 +164,9 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     }
     return this.getCacheOrInit(this.fixCode(param)).pipe(
       mergeMap(info => {
+        if (info.state === ExpressState.DELIVERED) {
+          return of(info);
+        }
         if (this.webhook) {
           if (info.request_count > 0) {
             return of(info);
