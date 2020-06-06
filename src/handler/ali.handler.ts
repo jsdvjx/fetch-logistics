@@ -33,13 +33,10 @@ export class AliHandler<
     param: ExpressInfo<AliExpressResponse>,
   ) => Observable<ExpressInfo<AliExpressResponse>>;
   protected expire: number = 3600 * 24 * 10;
-  protected checkList: { type: 'white' | 'black' | 'none'; codes: string[] } = {
-    type: 'white',
-    codes: ['SF'],
-  };
+  protected checkList: { type: 'white' | 'black' | 'none'; codes: string[] };
   protected _init?: () => Observable<any>;
   name: string = 'ALI';
-  webhook = true;
+  webhook: boolean = false;
   weight = 100;
   protected rate: number = 3600;
   protected max_count: number = 120;

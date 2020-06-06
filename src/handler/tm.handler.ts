@@ -28,10 +28,7 @@ export class TmHandler<
       .pipe(mergeMap(i => of(param)));
   };
   protected expire: number = 3600 * 24 * 10;
-  protected checkList: { type: 'white' | 'black' | 'none'; codes: string[] } = {
-    type: 'black',
-    codes: ['sf-express'],
-  };
+  protected checkList: { type: 'white' | 'black' | 'none'; codes: string[] };
   private tm: TrackingMoreApi;
   protected _init?: () => Observable<any> = () => {
     this.tm = new TrackingMoreApi(this.config.apiKey);

@@ -304,7 +304,7 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
   };
   protected abstract initCode: () => Observable<ExpressCompanyCode[]>;
   codeMap: ExpressCompanyCode[] = null;
-  protected codes: Set<string>;
+  codes: Set<string>;
   protected abstract _init?: () => Observable<any>;
   init = () => {
     return (this._init || (() => of(null)))().pipe(
