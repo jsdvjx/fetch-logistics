@@ -66,6 +66,13 @@ export class Dispatcher {
     }
     return null;
   };
+  push = <T>(source: T, handler_name: string) => {
+    return (
+      this.getHandler(handler_name) || {
+        push: () => of(null as ExpressInfo<T>),
+      }
+    ).push(source);
+  };
   query = (
     param: QueryParam,
     force: boolean = true,

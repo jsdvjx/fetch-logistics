@@ -28,7 +28,10 @@ interface AliExpressResponse {
 }
 export class AliHandler<
   O extends { appCode: string } = { appCode: string }
-> extends IExpress<AliExpressResponse,O> {
+> extends IExpress<AliExpressResponse, O> {
+  protected put: (
+    param: ExpressInfo<AliExpressResponse>,
+  ) => Observable<ExpressInfo<AliExpressResponse>>;
   protected expire: number = 3600 * 24 * 10;
   protected checkList: { type: 'white' | 'black' | 'none'; codes: string[] } = {
     type: 'white',

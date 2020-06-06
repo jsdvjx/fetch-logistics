@@ -134,6 +134,7 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
   protected abstract getProcess: (data: T) => ExpressProcess[];
   protected abstract fetch: (param: ExpressInfo<T>) => Observable<T>;
   protected abstract signTemplates: SignTemplate[];
+  protected abstract put: (param: ExpressInfo<T>) => Observable<ExpressInfo<T>>;
   protected abstract checkList: {
     type: 'white' | 'black' | 'none';
     codes: string[];
@@ -159,6 +160,12 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     }
     return this.getCacheOrInit(this.fixCode(param)).pipe(
       mergeMap(info => {
+        if (this.webhook) {
+          if (info.request_count > 0) {
+            return of(info);
+          }
+          return this.put(info).pipe(tap(i => this.after_convert([i, i])));
+        }
         if (info.request_count >= this.max_count && !force) {
           return of(info);
         }

@@ -13,10 +13,20 @@ import {
   TrackingInformation,
 } from 'trackingmore';
 import { Observable, of } from 'rxjs';
-import { pluck, map } from 'rxjs/operators';
+import { pluck, map, mergeMap } from 'rxjs/operators';
 export class TmHandler<
   O extends { apiKey: string } = { apiKey: string }
 > extends IExpress<WebhookBody, O> {
+  protected put: (
+    param: ExpressInfo<WebhookBody>,
+  ) => Observable<ExpressInfo<WebhookBody>> = param => {
+    return this.tm
+      .createTracking({
+        tracking_number: param.number,
+        carrier_code: param.code as any,
+      })
+      .pipe(mergeMap(i => of(param)));
+  };
   protected expire: number = 3600 * 24 * 10;
   protected checkList: { type: 'white' | 'black' | 'none'; codes: string[] } = {
     type: 'black',
