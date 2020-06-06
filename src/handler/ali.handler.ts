@@ -41,7 +41,7 @@ export class AliHandler<
   protected rate: number = 3600;
   protected max_count: number = 120;
   protected getState: (data: AliExpressResponse) => ExpressState = data =>
-    data.state || ExpressState.UNACTIVE;
+    parseInt(data.state as any) || ExpressState.UNACTIVE;
   protected getProcess: (
     data: AliExpressResponse,
   ) => ExpressProcess[] = input =>

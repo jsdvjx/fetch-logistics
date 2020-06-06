@@ -141,6 +141,9 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     codes: string[];
   };
   legal: (param: QueryParam) => boolean = param => {
+    if (!this.check(param.code)) {
+      return false;
+    }
     const code = this.fixCode(param).code;
     return this.codes.has(code) && this.check(code);
   };
