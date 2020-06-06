@@ -4,6 +4,7 @@ import { map, mergeMap, tap, concatMap } from 'rxjs/operators';
 import * as crypto from 'crypto';
 import * as levenshtien from 'damerau-levenshtein';
 import { TmHandler } from './handler/tm.handler';
+import * as dayjs from 'dayjs';
 export enum ExpressState {
   /**
    * 无效状态
@@ -71,8 +72,8 @@ export interface QueryParam {
   delivery_time?: Date;
 }
 export interface SignTemplate {
-  content: string;
-  step: number;
+  regex: RegExp[];
+  code: string;
 }
 export interface ExpressCompanyCode {
   company: string;
@@ -110,7 +111,7 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     this.max_count = config.max_count || this.max_count;
     this.checkList = config.policy ||
       this.checkList || { type: 'none', codes: [] };
-    this.signTemplates = config.signTemplates || this.signTemplates;
+    //this.signTemplates = config.signTemplates || this.signTemplates;
     this.expire = config.expire || this.expire;
   };
   getConfig = () => {
@@ -244,9 +245,11 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     ExpressInfo<T>,
   ] => {
     const _state = this.getState(source);
-    const data = this.getProcess(source);
+    const data = this.getProcess(source).sort(
+      (a, b) => dayjs(b.time).valueOf() - dayjs(a.time).valueOf(),
+    );
     const md5 = this.getMd5(data);
-    const guess = this.guess_sign(data);
+    const guess = this.guess_sign(data, container.code);
     const request_count = container.request_count;
     const now = new Date();
     const state =
@@ -279,12 +282,22 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     p1: string,
     p2: string,
   ) => LevenshteinResponse = levenshtien;
-  private guess_sign = (process: ExpressProcess[]) => {
+  private guess_sign = (process: ExpressProcess[], code: string) => {
     const lastInfo = process[0];
+    if (
+      dayjs(lastInfo.time)
+        .add(1, 'd')
+        .isAfter(dayjs())
+    ) {
+      return false;
+    }
     for (const template of this.signTemplates) {
-      const response = levenshtien(lastInfo, template) as LevenshteinResponse;
-      if (response.steps <= template.step) {
-        return true;
+      if (template.code === code) {
+        for (const reg of template.regex) {
+          if (reg.test(lastInfo.content)) {
+            return true;
+          }
+        }
       }
     }
     return false;
