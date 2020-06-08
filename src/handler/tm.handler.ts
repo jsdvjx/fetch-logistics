@@ -69,17 +69,27 @@ export class TmHandler<
   protected fetch: (
     param: ExpressInfo<WebhookBody>,
   ) => Observable<WebhookBody> = param => {
-    return this.tm
-      .getTracking({
-        tracking_number: param.number,
-        carrier_code: param.code as any,
-      })
-      .pipe(
-        map(i => {
-          return i.data.data;
-        }),
-        map(this.info2body),
-      );
+    const result = () =>
+      this.tm
+        .getTracking({
+          tracking_number: param.number,
+          carrier_code: param.code as any,
+        })
+        .pipe(
+          map(i => {
+            return i.data.data;
+          }),
+          map(this.info2body),
+        );
+    if (param.request_count === 0) {
+      this.tm
+        .createTracking({
+          tracking_number: param.number,
+          carrier_code: param.code as any,
+        })
+        .pipe(mergeMap(() => result()));
+    }
+    return result();
   };
   private info2body: (info: TrackingInformation) => WebhookBody = info => {
     return info

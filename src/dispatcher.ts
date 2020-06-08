@@ -80,7 +80,7 @@ export class Dispatcher {
   ) => {
     const handler = this.chose(param, handler_name);
     if (handler.webhook) {
-      return !force && handler.put(param);
+      return !force ? handler.put(param) : of(null);
     }
     return (handler
       ? (force ? handler.query : handler.getCacheOrInit)(param, force)
