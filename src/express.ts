@@ -94,6 +94,7 @@ export interface ExpressHandlerOption<T extends Record<string, any>> {
   conf: T;
   signTemplates?: SignTemplate[];
   expire?: number;
+  diy_map?: ExpressCompanyCode[];
 }
 export abstract class IExpress<T extends Record<string, any> = any, P = any> {
   private redis: RxRedis;
@@ -102,6 +103,7 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     this.redis = option.redis;
     this.setConfig(option.config);
   }
+  protected abstract diy_map: ExpressCompanyCode[];
   protected abstract expire: number = 3600 * 24 * 10;
   setConfig = (config: ExpressHandlerOption<P>) => {
     this.config = this.config || config.conf;
@@ -111,6 +113,7 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     this.max_count = config.max_count || this.max_count;
     this.checkList = config.policy ||
       this.checkList || { type: 'none', codes: [] };
+    this.diy_map = config.diy_map;
     //this.signTemplates = config.signTemplates || this.signTemplates;
     this.expire = config.expire || this.expire;
   };
@@ -339,10 +342,16 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
   };
   protected fixCode = (param: QueryParam) => {
     if (this.codes.has(param.code)) return param;
+    for (const i of this.diy_map) {
+      if (param.company === i.company) {
+        param.code = i.code;
+        return param;
+      }
+    }
     const code = this.codeMap
       .map(tmp => {
         const step =
-          this.levenshtien(tmp.code, param.code).steps +
+          this.levenshtien(tmp.code, param.code || '').steps +
           this.levenshtien(tmp.company, param.company).steps;
         return { ...tmp, step };
       })

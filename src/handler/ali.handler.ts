@@ -29,6 +29,7 @@ interface AliExpressResponse {
 export class AliHandler<
   O extends { appCode: string } = { appCode: string }
 > extends IExpress<AliExpressResponse, O> {
+  protected diy_map: ExpressCompanyCode[];
   protected _put: (
     param: ExpressInfo<AliExpressResponse>,
   ) => Observable<ExpressInfo<AliExpressResponse>>;
