@@ -302,6 +302,9 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
   ) => LevenshteinResponse = levenshtien;
   private guess_sign = (process: ExpressProcess[], code: string) => {
     const lastInfo = process[0];
+    if (!lastInfo) {
+      return false;
+    }
     if (
       dayjs(lastInfo.time)
         .add(1, 'd')
