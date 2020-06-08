@@ -17,7 +17,7 @@ import { pluck, map, mergeMap } from 'rxjs/operators';
 export class TmHandler<
   O extends { apiKey: string } = { apiKey: string }
 > extends IExpress<WebhookBody, O> {
-  protected put: (
+  protected _put: (
     param: ExpressInfo<WebhookBody>,
   ) => Observable<ExpressInfo<WebhookBody>> = param => {
     return this.tm

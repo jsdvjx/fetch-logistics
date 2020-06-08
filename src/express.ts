@@ -135,7 +135,9 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
   protected abstract getProcess: (data: T) => ExpressProcess[];
   protected abstract fetch: (param: ExpressInfo<T>) => Observable<T>;
   protected abstract signTemplates: SignTemplate[];
-  protected abstract put: (param: ExpressInfo<T>) => Observable<ExpressInfo<T>>;
+  protected abstract _put: (
+    param: ExpressInfo<T>,
+  ) => Observable<ExpressInfo<T>>;
   protected abstract checkList: {
     type: 'white' | 'black' | 'none';
     codes: string[];
@@ -158,6 +160,16 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
         return true;
     }
   };
+  put = (param: QueryParam) => {
+    return this.getCacheOrInit(param).pipe(
+      mergeMap(info => {
+        if (info.request_count > 0) {
+          return of(info);
+        }
+        return this._put(info).pipe(tap(i => this.after_convert([i, i])));
+      }),
+    );
+  };
   query = (param: QueryParam, force: boolean = false) => {
     if (!this.checkExNu(param)) {
       throw new Error(`${param.company},${param.number} illegal`);
@@ -167,16 +179,10 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
         if (info.state === ExpressState.DELIVERED) {
           return of(info);
         }
-        if (this.webhook) {
-          if (info.request_count > 0) {
-            return of(info);
-          }
-          return this.put(info).pipe(tap(i => this.after_convert([i, i])));
-        }
         if (info.request_count >= this.max_count && !force) {
           return of(info);
         }
-        if (this.rate > (Date.now() / 1000 - info.last_request)) {
+        if (this.rate > Date.now() / 1000 - info.last_request) {
           return of(info);
         }
         return this.fetch(info).pipe(
@@ -257,7 +263,6 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     const data = this.getProcess(source).sort(
       (a, b) => dayjs(b.time).valueOf() - dayjs(a.time).valueOf(),
     );
-    const md5 = this.getMd5(data);
     const guess = this.guess_sign(data, container.code);
     const request_count = container.request_count;
     const now = new Date();
@@ -265,6 +270,7 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
       _state !== ExpressState.DELIVERED && guess
         ? ExpressState.DELIVERED
         : _state;
+    const md5 = this.getMd5(data, state);
     const source_state = _state;
     return [
       {
@@ -281,10 +287,10 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
       container,
     ];
   };
-  private getMd5 = (last: ExpressProcess[]) => {
+  private getMd5 = (last: ExpressProcess[], state: ExpressState) => {
     return crypto
       .createHash('md5')
-      .update(last.map(i => i.time.toISOString()).join(''))
+      .update(last.map(i => i.time.toISOString()).join('') + '_' + state)
       .digest('hex');
   };
   protected levenshtien: (
