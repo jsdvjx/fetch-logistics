@@ -29,7 +29,7 @@ interface AliExpressResponse {
 export class AliHandler<
   O extends { appCode: string } = { appCode: string }
 > extends IExpress<AliExpressResponse, O> {
-  protected put: (
+  protected _put: (
     param: ExpressInfo<AliExpressResponse>,
   ) => Observable<ExpressInfo<AliExpressResponse>>;
   protected expire: number = 3600 * 24 * 10;
