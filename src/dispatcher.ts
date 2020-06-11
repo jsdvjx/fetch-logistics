@@ -79,12 +79,17 @@ export class Dispatcher {
     handler_name: string = null,
   ) => {
     const handler = this.chose(param, handler_name);
+    if (!handler) {
+      console.error('HANDLER NOT FOUND', JSON.stringify(param));
+      return of(null);
+    }
     if (handler.webhook && !force) {
       return handler.put(param);
     }
-    return (handler
-      ? (force ? handler.query : handler.getCacheOrInit)(param, force)
-      : of(null)) as Observable<ExpressInfo<any>>;
+    return (force ? handler.query : handler.getCacheOrInit)(
+      param,
+      force,
+    ) as Observable<ExpressInfo<any>>;
   };
   getHandlerName = () => {
     return this.handlers.map(i => i.name);
