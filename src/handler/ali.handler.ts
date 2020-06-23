@@ -51,7 +51,9 @@ export class AliHandler<
       content: i.content,
     }));
   legal: (param: QueryParam) => boolean = param => {
-    return ['顺丰快递', '极兔速递'].includes(param.company);
+    const result= ['顺丰快递', '极兔速递'].includes(param.company);
+    console.log(JSON.stringify(result),'ALI_HANDLER')
+    return result;
   };
   private baseUrl = 'https://cexpress.market.alicloudapi.com/';
   protected fetch: (
