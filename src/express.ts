@@ -179,18 +179,20 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     }
     return this.getCacheOrInit(this.fixCode(param)).pipe(
       mergeMap(info => {
+        console.log(JSON.stringify(info),'QUERY_FL');
         if (info.state === ExpressState.DELIVERED) {
           return of(info);
         }
         if (info.request_count >= this.max_count && !force) {
           return of(info);
         }
-        if (this.rate < Date.now() / 1000 - (info.last_request || 0)) {
+        if (this.rate > Date.now() / 1000 - (info.last_request || 0)) {
           return of(info);
         }
         if (this.webhook && !force) {
           return of(this.after_convert(this.convert([info, info.source]))[0]);
         }
+        console.log("REAL_QUERY",info.number,info.company)
         return this.fetch(info).pipe(
           mergeMap(source => this.push(source, param)),
         );
