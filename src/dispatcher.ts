@@ -86,10 +86,7 @@ export class Dispatcher {
     if (handler.webhook && !force) {
       return handler.put(param);
     }
-    return (force ? handler.query : handler.getCacheOrInit)(
-      param,
-      force,
-    ) as Observable<ExpressInfo<any>>;
+    return handler.query(param, force) as Observable<ExpressInfo<any>>;
   };
   getHandlerName = () => {
     return this.handlers.map(i => i.name);
