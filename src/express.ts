@@ -145,7 +145,7 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     type: 'white' | 'black' | 'none';
     codes: string[];
   };
-  legal: (param: QueryParam) => boolean = param => {
+  legal: (param: QueryParam) => boolean = (param) => {
     if (!this.check(param.code)) {
       return false;
     }
@@ -165,11 +165,11 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
   };
   put = (param: QueryParam) => {
     return this.getCacheOrInit(param).pipe(
-      mergeMap(info => {
+      mergeMap((info) => {
         if (info.request_count > 0) {
           return of(info);
         }
-        return this._put(info).pipe(tap(i => this.after_convert([i, i])));
+        return this._put(info).pipe(tap((i) => this.after_convert([i, i])));
       }),
     );
   };
@@ -178,8 +178,8 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
       throw new Error(`${param.company},${param.number} illegal`);
     }
     return this.getCacheOrInit(this.fixCode(param)).pipe(
-      mergeMap(info => {
-        console.log(JSON.stringify(info),'QUERY_FL');
+      mergeMap((info) => {
+        console.log(JSON.stringify(info), 'QUERY_FL');
         if (info.state === ExpressState.DELIVERED) {
           return of(info);
         }
@@ -192,9 +192,9 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
         if (this.webhook && !force) {
           return of(this.after_convert(this.convert([info, info.source]))[0]);
         }
-        console.log("REAL_QUERY",info.number,info.company)
+        console.log('REAL_QUERY', info.number, info.company);
         return this.fetch(info).pipe(
-          mergeMap(source => this.push(source, param)),
+          mergeMap((source) => this.push(source, param)),
         );
       }),
     );
@@ -230,7 +230,9 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     if (!result) console.error(`${param.company},${param.number}`, 'illegal');
     return result;
   };
-  protected initExpressInfo: (param: QueryParam) => ExpressInfo<T> = param => {
+  protected initExpressInfo: (param: QueryParam) => ExpressInfo<T> = (
+    param,
+  ) => {
     const now = new Date();
     const result = {
       ...param,
@@ -251,7 +253,7 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
   getCacheOrInit = (param: QueryParam) => {
     const key = this.getKey(param);
     return this.redis.get(key).pipe(
-      mergeMap(cache => {
+      mergeMap((cache) => {
         if (cache === null) {
           return of(this.initExpressInfo(param));
         } else {
@@ -298,7 +300,7 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
   private getMd5 = (last: ExpressProcess[], state: ExpressState) => {
     return crypto
       .createHash('md5')
-      .update(last.map(i => i.time.toISOString()).join('') + '_' + state)
+      .update(last.map((i) => i.time.toISOString()).join('') + '_' + state)
       .digest('hex');
   };
   protected levenshtien: (
@@ -310,11 +312,7 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
     if (!lastInfo) {
       return false;
     }
-    if (
-      dayjs(lastInfo.time)
-        .add(1, 'd')
-        .isAfter(dayjs())
-    ) {
+    if (dayjs(lastInfo.time).add(1, 'd').isAfter(dayjs())) {
       return false;
     }
     for (const template of this.signTemplates) {
@@ -335,23 +333,23 @@ export abstract class IExpress<T extends Record<string, any> = any, P = any> {
   init = () => {
     return (this._init || (() => of(null)))().pipe(
       mergeMap(this.initCode),
-      tap(codeMap => {
+      tap((codeMap) => {
         this.codeMap = codeMap;
-        this.codes = new Set(this.codeMap.map(i => i.code));
+        this.codes = new Set(this.codeMap.map((i) => i.code));
       }),
       map(() => this),
     );
   };
   protected fixCode = (param: QueryParam) => {
     if (this.codes.has(param.code)) return param;
-    for (const i of this.diy_map) {
+    for (const i of this.diy_map || []) {
       if (param.company === i.company) {
         param.code = i.code;
         return param;
       }
     }
     const code = this.codeMap
-      .map(tmp => {
+      .map((tmp) => {
         const step =
           this.levenshtien(tmp.code, param.code || '').steps +
           this.levenshtien(tmp.company, param.company).steps;
