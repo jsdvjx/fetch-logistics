@@ -21,7 +21,7 @@
   "gitHead": "52725f03d09565f9002819a78c6110b5724682a0",
   "dependencies": {
     "@jsdvjx/query-fun": "^0.1.7",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "damerau-levenshtein": "^1.0.6",
     "dayjs": "^1.8.28",
     "redis": "^3.0.2",
